@@ -1,0 +1,44 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import with_statement
+
+import os
+import sys
+import subprocess
+import random
+import json
+
+import stream_installer
+
+###### install
+
+destdir = None
+stream_as_dirname = None
+
+download_url = sys.argv[3]
+destdir, stream_as_dirname = stream_installer.do_install("stream_as", url=download_url)
+if (destdir is None) or (stream_as_dirname is None):
+    sys.exit(2)
+
+###### configure
+
+conf = json.loads(sys.argv[1])
+
+report_ip = sys.argv[2]
+report_port = "10891"
+
+###### run
+
+subprocess.call(["ldconfig"])
+
+os.chdir("/{0}/{1}".format(destdir, stream_as_dirname))
+pid = subprocess.Popen(["./as",
+                        "--ip", report_ip,
+                        "--port", report_port,
+                        "--id", conf["session_app_id"],
+                        "--http", conf["access_url"] ]).pid
+
+###### record
+
+stream_installer.save_service_status(name="stream_as", script="", pid=[pid])
