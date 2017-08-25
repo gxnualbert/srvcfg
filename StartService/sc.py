@@ -4,47 +4,35 @@
 from __future__ import with_statement
 
 import os
-import sys
+
 import subprocess
 import string
-import json
 
 
-###### install
 
-# destdir = None
-# sc_dirname = None
-
-# download_url = sys.argv[3]
-# destdir, sc_dirname = stream_installer.do_install("sc.py", url=download_url)
-# if (destdir is None) or (sc_dirname is None):
-#     sys.exit(2)
-
-###### configure
-
-def ModifySCConf(ice_addr,kafka_brokers,zookeeper_servers,sc_topic,sc_group_topic,consumer_client_id,sc_ms_group,destdir, sc_dirname):
+def ModifySCConf(ice_addr,kafka_brokers,zookeeper_servers,sc_topic,sc_group_topic,consumer_client_id,sc_ms_group,sc_construct_file_path):
 
 
     template = """
-    application.name=sc
-    bootstrap.servers=$kafka_brokers
-    zookeeper.servers=$zookeeper_servers
-    retry.policy=0
-    ice.addr=$ice_addr
-    topic.partions=3
-    topic.replication=2
-    topic.sc.name = $sc_topic
-    topic.sc.group.name = $sc_group_topic
-    topic.sc.group1.name=$sc_ms_group
-    consumer.client.id=$consumer_client_id
+application.name=sc
+bootstrap.servers=$kafka_brokers
+zookeeper.servers=$zookeeper_servers
+retry.policy=0
+ice.addr=$ice_addr
+topic.partions=3
+topic.replication=2
+topic.sc.name = $sc_topic
+topic.sc.group.name = $sc_group_topic
+topic.sc.group1.name=$sc_ms_group
+consumer.client.id=$consumer_client_id
 
-    message.protocol.version = 1
-    max.instance.size = 5
-    routerStatus.return.size = 5
+message.protocol.version = 1
+max.instance.size = 5
+routerStatus.return.size = 5
 
-    lock.root.path = /sclock
-    lock.getSuperiorStreamServer.timeout=5
-    service.parent.node=/fsp/sc
+lock.root.path = /sclock
+lock.getSuperiorStreamServer.timeout=5
+service.parent.node=/fsp/sc
     """
 
     items = {}
@@ -55,25 +43,23 @@ def ModifySCConf(ice_addr,kafka_brokers,zookeeper_servers,sc_topic,sc_group_topi
     items["sc_topic"] = sc_topic
     items["sc_group_topic"] = sc_group_topic
     items["sc_ms_group"] = sc_ms_group
-    items["consumer_client_id"] = consumer_client_id
+    items["consumer_client_id"] = "client"+consumer_client_id
 
     t = string.Template(template)
     new_content = t.substitute(items)
 
-    sc_conf_path = "/{0}/{1}/conf/init.properties".format(destdir, sc_dirname)
-    with open(sc_conf_path, "w") as f:
+
+    with open(sc_construct_file_path + "/init.properties", "w") as f:
         f.write(new_content)
 
-def StartSC(destdir,sc_dirname):
+
+if __name__ == "__main__":
+    FILE_PATH = "/fsp_sss_stream"
+    if os.path.exists(FILE_PATH):
+        print "path:%s exits" % FILE_PATH
+    else:
+        os.makedirs(FILE_PATH)
+    subprocess.Popen(["/fsp_sss_stream/fsp-sc/bin/sc_start.sh"], shell=True)
 
 
-    os.chdir("/{0}/{1}/bin".format(destdir, sc_dirname))
-    pid = subprocess.Popen(["./sc_start.sh"]).pid
-
-# ###### record
-#
-# stream_installer.save_service_status(
-#     name="sc.py",
-#     script="{0}/{1}/bin/sc_stop.sh".format(destdir, sc_dirname),
-#     pid=[])
 

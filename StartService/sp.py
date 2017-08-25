@@ -4,47 +4,42 @@
 from __future__ import with_statement
 
 import os
-import sys
+
 import subprocess
 import string
-import json
 
 
 
-
-###### install
-
-
-def ModifySPConf(ice_addr,kafka_brokers,zookeeper_servers,sp_topic,sc_group_topic,gc_group_topic,sp_server_id,destdir, sp_dirname):
-    tomcat_home = "/fsp_sss_stream/apache-tomcat-sp"
-    tomcat_conf = "{0}/conf".format(tomcat_home)
-    sp_home = "{0}/{1}".format(destdir, sp_dirname)
-
-
-    os.chdir(tomcat_conf)
-    subprocess.call(["mv server.xml server.xml.bak"], shell=True)
-    subprocess.call(["cp /fsp_sss_stream/sp/server.xml ."], shell=True)
+def ModifySPConf(ice_addr,kafka_brokers,zookeeper_servers,sp_topic,sc_group_topic,gc_group_topic,sp_server_id,sp_construct_file_path):
+    # tomcat_home = "/fsp_sss_stream/apache-tomcat-sp"
+    # tomcat_conf = "{0}/conf".format(tomcat_home)
+    # sp_home = "{0}/{1}".format(destdir, sp_dirname)
+    #
+    #
+    # os.chdir(tomcat_conf)
+    # subprocess.call(["mv server.xml server.xml.bak"], shell=True)
+    # subprocess.call(["cp /fsp_sss_stream/sp/server.xml ."], shell=True)
 
     ###### configure
 
     #目前sp的实例名称设置为sp的topic.
 
     template = """
-    bootstrap.servers=$kafka_brokers
-    zookeeper.servers=$zookeeper_servers
-    retry.policy=0
-    ice.addr=$ice_addr
-    topic.partions=3
-    topic.replication=2
-    topic.sp.name = $sp_topic
-    topic.sc.group.name = $sc_group_topic
-    topic.gc.group.name = $gc_group_topic
+bootstrap.servers=$kafka_brokers
+zookeeper.servers=$zookeeper_servers
+retry.policy=0
+ice.addr=$ice_addr
+topic.partions=3
+topic.replication=2
+topic.sp.name = $sp_topic
+topic.sc.group.name = $sc_group_topic
+topic.gc.group.name = $gc_group_topic
 
-    sp.server.id = $sp_server_id
-    sp.port = $port
+sp.server.id = $sp_server_id
+sp.port = $port
 
-    message.protocol.version = 1
-    service.parent.node=/fsp/sp
+message.protocol.version = 1
+service.parent.node=/fsp/sp
     """
 
     items = {}
@@ -62,8 +57,10 @@ def ModifySPConf(ice_addr,kafka_brokers,zookeeper_servers,sp_topic,sc_group_topi
     t = string.Template(template)
     new_content = t.substitute(items)
 
-    sp_conf_path = "{0}/WEB-INF/classes/init.properties".format(sp_home)
-    with open(sp_conf_path, "w") as f:
+    # sp_conf_path = "{0}/WEB-INF/classes/init.properties".format(sp_home)
+    # with open(sp_conf_path, "w") as f:
+    #     f.write(new_content)
+    with open(sp_construct_file_path + "/init.properties", "w") as f:
         f.write(new_content)
 
 ###### run
@@ -77,9 +74,5 @@ def StartSP(tomcat_home,destdir,sc_dirname):
     subprocess.call(["netstat -anp|grep 8444|awk '{print $7}'|awk -F'/' '{print $1}'|xargs kill -9"], shell=True)
     subprocess.call(["./startup.sh"])
 
-###### record
 
-# stream_installer.save_service_status(
-#     name="sp",
-#     script="{0}/shutdown.sh".format(tomcat_bin))
 

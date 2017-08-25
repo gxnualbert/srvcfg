@@ -1,0 +1,35 @@
+#!/usr/bin/expect -f
+set ip [lindex $argv 0]
+set password [lindex $argv 1]
+set version [lindex $argv 2]
+set servicename [lindex $argv 3]
+
+spawn ssh root@$ip
+expect {
+  "*yes/no" {
+    send "yes\r";
+    exp_continue
+  }
+
+  "*password:" {
+    send "\$password\r";
+    exp_continue
+  }
+
+  "*#" {
+    send "\r"
+  }
+}
+
+expect "*#"
+
+
+send "cd fsp-sss-stream-$version/tools\n"
+expect "*#"
+
+send "./install_server.sh $servicename \n"
+expect "*#"
+
+send "exit\r"
+expect eof
+

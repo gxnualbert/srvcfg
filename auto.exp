@@ -1,0 +1,54 @@
+#!/usr/bin/expect -f
+
+set ip [lindex $argv 0]
+set password [lindex $argv 1]
+set version [lindex $argv 2]
+set buildid [lindex $argv 3]
+set dirname /root/fsp-sss-stream-2.0.4.10/md5sum.txt
+
+set packagepath /fsp_sss_stream/
+set timeout 600
+
+
+puts "ip is $ip"
+spawn ssh root@$ip
+expect {
+  "*yes/no" {
+    send "yes\r";
+    exp_continue
+  }
+
+  "*password:" {
+    send "\$password\r";
+    exp_continue
+  }
+
+  "*#" {
+    send "\r"
+  }
+}
+expect "*#"
+puts "dir is $dirname"
+puts [file exist $dirname]
+
+
+if {[file exist $dirname]} {
+	puts "$dirname exists, will no download again!!!"
+} else {
+send "curl -O http://192.168.5.30:8088/jenkins/view/%E5%B9%B3%E5%8F%B0%E4%BA%A7%E5%93%81%E7%BA%BF/job/build_platform_fsp_stream/$buildid/artifact/fsp-sss-stream-$version\.tar.gz\r"
+expect "*#"
+
+send "tar -xf fsp-sss-stream-$version\.tar.gz\r"
+expect "*#"
+
+}
+
+if {[file exist $packagepath]} {
+  send "mkdir /fsp_sss_stream/\n"
+  expect "*#"
+}
+
+
+
+send "exit\r"
+expect eof

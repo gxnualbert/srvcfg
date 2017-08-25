@@ -3,34 +3,31 @@
 
 from __future__ import with_statement
 
-import os
-import sys
+import os,sys
+
 import subprocess
 import string
-import json
 
 
-def ModifyMSConf(ice_addr,kafka_brokers,zookeeper_servers,ma_topic,destdir, ma_dirname):
+
+def ModifyMSConf(ice_addr,kafka_brokers,zookeeper_servers,ma_topic,ma_construct_file_path):
 
     t_config = """
-    application.name=ma
-
-    bootstrap.servers=$kafka_brokers
-    zookeeper.servers=$zookeeper_servers
-
-
-    retry.policy=0
-    zk.acl.name=ma
-    zk.acl.password=123456
-    ice.addr=$ice_addr
-    service.parent.node=/fsp/ma
-    node.ma.topic=$ma_topic
-    topic.partions=1
-    topic.replication=1
-    ping.times= 5
-    ping.timeout= 10
-    distance.expression = (p(L+1,2)-1)*32+D
-    ma.bandwidth=1000
+application.name=ma
+bootstrap.servers=$kafka_brokers
+zookeeper.servers=$zookeeper_servers
+retry.policy=0
+zk.acl.name=ma
+zk.acl.password=123456
+ice.addr=$ice_addr
+service.parent.node=/fsp/ma
+node.ma.topic=$ma_topic
+topic.partions=1
+topic.replication=1
+ping.times= 5
+ping.timeout= 10
+distance.expression = (p(L+1,2)-1)*32+D
+ma.bandwidth=1000
 
     """
 
@@ -46,18 +43,16 @@ def ModifyMSConf(ice_addr,kafka_brokers,zookeeper_servers,ma_topic,destdir, ma_d
     t = string.Template(t_config)
     new_content = t.substitute(items)
 
-    ma_conf_path = "{0}/{1}/conf/init.properties".format(destdir, ma_dirname)
-    with open(ma_conf_path, "w") as f:
+    with open(ma_construct_file_path+"/init.properties", "w") as f:
         f.write(new_content)
 
-def StartMA(destdir,ma_dirname):
 
-    os.chdir("{0}/{1}/bin".format(destdir, ma_dirname))
-    pid = subprocess.Popen(["./ma_start.sh"]).pid
 
-###### record
+if __name__ == "__main__":
 
-# stream_installer.save_service_status(
-#     name="ma",
-#     script="{0}/{1}/bin/ma_stop.sh".format(destdir, ma_dirname),
-#     pid=[])
+    FILE_PATH="/fsp_sss_stream"
+    if os.path.exists(FILE_PATH):
+        print  "path:%s exits" % FILE_PATH
+    else:
+        os.makedirs(FILE_PATH)
+    subprocess.Popen(["/fsp_sss_stream/fsp-ma-1.0-SNAPSHOT/bin/ma_start.sh"], shell=True)
