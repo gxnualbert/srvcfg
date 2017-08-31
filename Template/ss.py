@@ -40,8 +40,4 @@ def ModifySSConf(ss_local_ip,ss_instance_id,kafka_brokers,zookeeper_servers,sc_g
 
 
 
-def StartSS(destdir, ss_dirname):
-    os.chdir("/{0}/{1}".format(destdir, ss_dirname))
-    subprocess.Popen(["./test_stream_server_ss < ss.config"]).pid
-
 

@@ -1,0 +1,112 @@
+#!/usr/bin/expect -f
+
+set ip [lindex $argv 0]
+set password [lindex $argv 1]
+set serviceName [lindex $argv 2]
+
+
+spawn -noecho ssh root@$ip
+log_user 0
+
+
+expect {
+  "*yes/no" {
+    send "yes\r";
+    log_user 0
+    exp_continue
+  }
+
+  "*password:" {
+    send "\$password\r";
+    log_user 0
+    exp_continue
+  }
+
+  "*#" {
+    send "\r"
+    log_user 0
+  }
+}
+log_user 0
+
+expect "*#"
+
+
+if {"$serviceName"=="access"} {
+ send "cd /tmp/\r";
+ expect "*#"
+
+ send "./startService.sh access\r"
+} elseif {"$serviceName"=="sp"} {
+ send "cd /tmp/\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="sc"} {
+ send "/fsp_sss_stream/sc/bin/sc_start.sh\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="gc"} {
+ send "/fsp_sss_stream/gc/bin/gc_start.sh\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="ma"} {
+ send "/fsp_sss_stream/ma/bin/ma_start.sh\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="ms"} {
+ send "/fsp_sss_stream/ms/bin/ms_start.sh\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="rule"} {
+ send "/fsp_sss_stream/rule/bin/rule_start.sh\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="gs"} {
+ puts "gs is not ready yet"
+
+} elseif {"$serviceName"=="ss"} {
+
+ send "nohup /fsp_sss_stream/ss/test_stream_server_ss < ss.config &\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="cp"} {
+
+ send "./test_proxy < cp.config\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="kafka"} {
+
+ send "nohup /usr/local/kafka_2.11-0.10.1.1/bin/kafka-server-start.sh /usr/local/kafka_2.11-0.10.1.1/config/server.properties &\r";
+ expect "*#"
+
+
+ } elseif {"$serviceName"=="zookeeper"} {
+
+ send "/usr/local/zookeeper-3.4.9/bin/zkServer.sh start\r";
+ expect "*#"
+
+} elseif {"$serviceName"=="redis"} {
+
+ send "./test_proxy < cp.config\r";
+ expect "*#"
+
+ } elseif {"$serviceName"=="master"} {
+
+ send "./test_proxy < cp.config\r";
+ expect "*#"
+
+ } elseif {"$serviceName"=="replica"} {
+
+ send "./test_proxy < cp.config\r";
+ expect "*#"
+
+ } elseif {"$serviceName"=="node"} {
+
+ send "./test_proxy < cp.config\r";
+ expect "*#"
+
+
+} else  {
+    puts "service: $serviceName not supported!!!!!"
+
+}

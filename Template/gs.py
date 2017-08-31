@@ -38,7 +38,5 @@ def ModifyGSConf(gs_local_ip, gs_instance_id, kafka_brokers, zookeeper_servers, 
         f.write(new_content)
 
 
-def StartGS(destdir, ss_dirname):
-    os.chdir("/{0}/{1}".format(destdir, ss_dirname))
-    subprocess.Popen(["./test_group_server < gs.config"]).pid
+
 

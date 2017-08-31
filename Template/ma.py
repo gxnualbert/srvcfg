@@ -10,7 +10,7 @@ import string
 
 
 
-def ModifyMSConf(ice_addr,kafka_brokers,zookeeper_servers,ma_topic,ma_construct_file_path):
+def ModifyMAConf(ice_addr,kafka_brokers,zookeeper_servers,ma_topic,ma_construct_file_path):
 
     t_config = """
 application.name=ma
@@ -28,7 +28,6 @@ ping.times= 5
 ping.timeout= 10
 distance.expression = (p(L+1,2)-1)*32+D
 ma.bandwidth=1000
-
     """
 
     items = {}
@@ -47,12 +46,3 @@ ma.bandwidth=1000
         f.write(new_content)
 
 
-
-if __name__ == "__main__":
-
-    FILE_PATH="/fsp_sss_stream"
-    if os.path.exists(FILE_PATH):
-        print  "path:%s exits" % FILE_PATH
-    else:
-        os.makedirs(FILE_PATH)
-    subprocess.Popen(["/fsp_sss_stream/fsp-ma-1.0-SNAPSHOT/bin/ma_start.sh"], shell=True)

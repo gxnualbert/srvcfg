@@ -4,32 +4,50 @@ set password [lindex $argv 1]
 set version [lindex $argv 2]
 set servicename [lindex $argv 3]
 
-spawn ssh root@$ip
+
+spawn -noecho ssh root@$ip
+log_user 0
+
 expect {
   "*yes/no" {
     send "yes\r";
+    log_user 0
     exp_continue
   }
 
   "*password:" {
     send "\$password\r";
+    log_user 0
     exp_continue
   }
 
   "*#" {
     send "\r"
+    log_user 0
   }
 }
+log_user 0
 
 expect "*#"
-
+log_user 0
 
 send "cd fsp-sss-stream-$version/tools\n"
+log_user 0
+
 expect "*#"
+log_user 0
+
 
 send "./install_server.sh $servicename \n"
+log_user 0
+
+
 expect "*#"
+log_user 0
+
 
 send "exit\r"
+log_user 0
+
 expect eof
 

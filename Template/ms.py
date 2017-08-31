@@ -11,7 +11,6 @@ import string
 def ModifyMSConf(kafka_brokers,zookeeper_servers,ice_addr,ms_topic,sc_ms_group_topic,ms_construct_file_path):
      t_config = """
 application.name=ms
-
 bootstrap.servers=$kafka_brokers
 zookeeper.servers=$zookeeper_servers
 retry.policy=0
@@ -21,17 +20,15 @@ ice.addr=$ice_addr
 topic.ms=$ms_topic
 topic.partions=1
 topic.replication=1
-topic.sc.py.group1.name = $sc_ms_topic
+topic.sc.group1.name = $sc_ms_topic
 poll.time=10
-
-
 master.path=/fsp/master/ms
 node.ma.parent=/fsp/ma
 service.parent.node=/fsp/ms
 access.path=/fsp/access
-gc.py.path=/fsp/gc.py
-rule.py.path=/fsp/rule.py
-sc.py.path=/fsp/sc.py
+gc.path=/fsp/gc
+rule.path=/fsp/rule
+sc.path=/fsp/sc
 sp.path=/fsp/sp
 cp.path=/fsp/cp
 ice.path=/fsp/ice
@@ -59,15 +56,6 @@ bindwidth.overload = 0.8
      with open(ms_construct_file_path + "/init.properties", "w") as f:
           f.write(new_content)
 
-
-if __name__ == "__main__":
-
-    FILE_PATH="/fsp_sss_stream"
-    if os.path.exists(FILE_PATH):
-        print  "path:%s exits" % FILE_PATH
-    else:
-        os.makedirs(FILE_PATH)
-    subprocess.Popen(["/fsp_sss_stream/fsp-ms-1.0-SNAPSHOT/bin/ms_start.sh"], shell=True)
 
 
 

@@ -53,13 +53,7 @@ service.parent.node=/fsp/sc
         f.write(new_content)
 
 
-if __name__ == "__main__":
-    FILE_PATH = "/fsp_sss_stream"
-    if os.path.exists(FILE_PATH):
-        print "path:%s exits" % FILE_PATH
-    else:
-        os.makedirs(FILE_PATH)
-    subprocess.Popen(["/fsp_sss_stream/fsp-sc/bin/sc_start.sh"], shell=True)
+
 
 
 

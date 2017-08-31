@@ -63,16 +63,9 @@ service.parent.node=/fsp/sp
     with open(sp_construct_file_path + "/init.properties", "w") as f:
         f.write(new_content)
 
-###### run
-# 这里的停止tomcat的方式使用 kill由端口查找到线程, 代替运行./shutdown 命令
-# sp 的http2 端口约定为 8444
 
-def StartSP(tomcat_home,destdir,sc_dirname):
-    tomcat_home = "/fsp_sss_stream/apache-tomcat-sp"
-    tomcat_bin = "{0}/bin".format(tomcat_home)
-    os.chdir(tomcat_bin)
-    subprocess.call(["netstat -anp|grep 8444|awk '{print $7}'|awk -F'/' '{print $1}'|xargs kill -9"], shell=True)
-    subprocess.call(["./startup.sh"])
+
+
 
 
 
